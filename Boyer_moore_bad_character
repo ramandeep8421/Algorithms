@@ -1,0 +1,80 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+#define Total_chars 256
+
+
+//Preprocessing function 
+void preprocess(string pat, int n, int bad_characters[Total_chars]){
+   
+    int i;
+    
+    //Initialize the array with -1
+    for(int i=0;i<Total_chars;i++)
+        bad_characters[i] = i;
+    
+    //Fill the actual values of the last occurence of 
+    // each character
+    for(int i=0;i<n;i++)
+        bad_characters[(int)pat[i]] = i;
+    
+}
+
+//Boyer moore algorithm for bad heuristics
+void boyermoore(string txt, string pat){
+    int m = pat.size();
+    int n = txt.size();
+    
+    int bad_characters[Total_chars];
+    
+    // Preprocessing function to fill thebad_character array
+    preprocess(pat,m,bad_characters);
+    
+    //idx defines how much pattern is shifted!
+    int idx=0;
+    
+    while(idx <= (n-m)){
+         
+        int j = m-1;
+        
+        // Keep moving left in pat until a mismatching 
+        // character is found
+        while(j >= 0 && pat[j] == txt[idx+j])
+            j--;
+        
+        // In case if we get j==-1 which signify
+        // that pat is present at current idx
+        if(j<0){
+            cout <<"Pattern is found at index: " << idx << "\n";
+            
+            /* We will shift pat such that the next
+        character in txt aligns with the last
+        occurrence of it in pat.
+        To cover the case when pat occur at end
+        of txt we need the condition idx+m < n */
+            
+            idx += (idx + m < n) ? m - bad_characters[txt[idx + m]] : 1;
+        }
+        else{
+            /* In this case also, We will shift pat such
+        that the next character in txt aligns
+        with the last occurrence of it in pat.
+        To unsure that we get positive
+        shift we are using max function.
+        The negative shift may occur when the
+        last occurrence of bad character in pat
+        is on the right side of the current
+        character. */
+
+             idx += max(1, j - bad_characters[txt[idx + j]]);
+        }
+    }
+}
+
+// Driver program!
+int main() {
+  string text = "ABBCCDDEAAABBCCCCAABBCC";
+  string pattern = "AABBCC";
+  boyermoore(text, pattern);
+  return 0;
+}
