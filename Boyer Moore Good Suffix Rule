@@ -1,0 +1,110 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+// This function will generate the displace array corresponding 
+// to the first case where we need to find the first occurence of 
+// pattern to the left of matching suffix such that 
+// the preceeding character to that occurence is different from the one in the pattern just before the 
+// matching suffix
+void preprocessCase1(vector<int>&displace, vector<int>&borderPos, string &pat){
+      
+      int m = pat.length();
+    
+      int i=m, j=m+1;
+      borderPos[i]=j;
+    
+      while(i>0){
+          
+           /* corresponding to strong good suffix rule , 
+            * if the preceeding character of the matching suffix does not match 
+            * i.e. pat[i-1] != pat[j-1]
+            */
+          while(j<=m && pat[i-1] != pat[j-1]){
+               
+              /* the character preceeding
+               *  the occurence of substring 
+               * str in pattern pat is differnt from the 
+               *  first mismatching character of pat
+               *  we stop moving and wer shift our pattern from i to j.
+               * Here displace[j] = 0 represents that  we have not displaced the pattern yet.*/
+              if(displace[j] == 0)
+                  displace[j] = j-i;  
+              
+              
+              // Update the position of next border
+              // i.e. longest matching proper suffix and prefix.
+              j = borderPos[j];
+          }
+          
+          //Pat[i-1] matched with pat[j-1]
+          // j-1 is the border for the position
+          // i-1
+          i--,j--;
+          borderPos[i]=j;
+          
+      }
+}
+
+// Preprocess for the case -2 where we try to match the 
+// suffix of the matching substring of pattern with the prefix of the pattern.
+void preprocessCase2(vector<int>&displace, vector<int>&borderPos, string pat){
+     int m = pat.length();
+     int j,i;
+    // find the longest matching suffix of the pattern which matches with its proper prefix
+    j = borderPos[0];
+    
+    for(int i=0;i<=m;i++){
+        
+        // since the longest suffix that matches with
+        // the prefix is j, so we shift all positions 
+        // having displacement as 0 to j.
+        if(displace[i]==0)
+            displace[i]=j;   // displace by j.
+        
+        // When i == j , simply use next border
+         if(i == j)
+             j = borderPos[j];
+    }
+}
+
+// Search function which searches for the pattern
+// in a given text using boyer moore rule
+void search(string txt, string pat){
+    
+    // Here dis calculate the shift that the pattern
+    // hat to do
+    int dis=0, j;
+    int n = txt.length();
+    int m = pat.length();
+    
+    // create borderPos and displace array
+    vector<int>displace(m+1),borderPos(m+1);
+    
+    // Preprocessing
+    preprocessCase1(displace,borderPos,pat);
+    preprocessCase2(displace,borderPos,pat);
+    
+    // dis can be at max n-m
+    while(dis <= n-m){
+        // start from the end of the
+        // pattern
+         j = m-1;
+         
+        // keep reducing the j until 
+        // characters of pattern and text 
+        // are matching at shift dis
+        while(j>=0 && pat[j] == txt[dis+j])
+            j--;
+        
+        // If the pattern exists at this shift then 
+        // j == - 1 
+        if(j<0){
+             cout << "Pattern found at shift: " << dis+1 << "\n";
+            dis += displace[0];
+        }else{
+             // case when pat[i] != pat[dis+j] 
+            // so shift the pattern by displace[j+1] times
+            dis += displace[j+1];
+        }
+    }
+}
