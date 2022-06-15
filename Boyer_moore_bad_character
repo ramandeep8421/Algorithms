@@ -71,10 +71,4 @@ void boyermoore(string txt, string pat){
     }
 }
 
-// Driver program!
-int main() {
-  string text = "ABBCCDDEAAABBCCCCAABBCC";
-  string pattern = "AABBCC";
-  boyermoore(text, pattern);
-  return 0;
-}
+
