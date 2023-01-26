@@ -42,13 +42,13 @@ def insert(str):
       character = ord(i)-97
       if character < 0:
         break
-      # print(character)
+      #print(character)
       if not trie[curr][character]:
         counter = operator.add(counter,1)
         trie[curr][character] = counter
       curr = trie[curr][character]
 
-    isEnd[curr]=1
+    isEnd[curr]=True
 
 k=0
 
@@ -63,4 +63,7 @@ while i < k:
    insert(str)
    i += 1
   
+
 print(wordCombinations(0,s))
+
+
