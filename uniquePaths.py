@@ -1,53 +1,52 @@
-from typing import List
-from queue import Queue
-
-
 class Solution:
+    def uniquePathsIII(self, grid: List[List[int]]) -> int:
+        # variable to store the final answer
+        ans = 0
 
-    def isValid(self, x: int, y: int, n: int, m: int) -> bool:
-        return x >= 0 and x <= n-1 and y >= 0 and y <= m-1
+        # direction vectors
+        dr = [-1, 0, 1, 0]
+        dc = [0, 1, 0, -1]
 
-    def shortestPath(self, grid: List[List[int]], k: int) -> int:
+        # function to check for the visited cells
+        def check(grid, vis):
+            n, m = len(grid), len(grid[0])
+            for i in range(n):
+                for j in range(m):
+                    if grid[i][j] == 0 and not vis[i][j]:
+                        return False
+            return True
 
-        # find the dimensions of the grid
-        n = len(grid)
-        m = len(grid[0])
+        # dfs function to perform the traversal
+        def dfs(i, j, x, y, grid, vis):
+            n, m = len(grid), len(grid[0])
 
-        # Direction vector
-        dir = [0, 1, 0, -1, 0]
+            if i == x and j == y:
+                vis[i][j] = True
+                if check(grid, vis):
+                    nonlocal ans
+                    ans += 1
+                vis[i][j] = False
+                return
 
-        steps = 0
+            vis[i][j] = True
+            for k in range(4):
+                newr, newc = i + dr[k], j + dc[k]
+                if newr < 0 or newr >= n or newc < 0 or newc >= m or grid[newr][newc] == -1 or vis[newr][newc]:
+                    continue
+                dfs(newr, newc, x, y, grid, vis)
+            vis[i][j] = False
 
-        # lives array to optimize the use of obstacle removal power
-        lives = [[-1 for j in range(m)] for i in range(n)]
+        n, m = len(grid), len(grid[0])
+        vis = [[False] * m for _ in range(n)]
 
-        # Declare a queue to push the elements
-        qu = Queue()
+        # Find the start and end points
+        for i in range(n):
+            for j in range(m):
+                if grid[i][j] == 1:
+                    sr, sc = i, j
+                elif grid[i][j] == 2:
+                    er, ec = i, j
 
-        qu.put([0, 0, k])
+        dfs(sr, sc, er, ec, grid, vis)
+        return ans
 
-        while not qu.empty():
-
-            size = qu.qsize()
-
-            for i in range(size):
-
-                row, col, currLives = qu.get()
-
-                if row == n-1 and col == m-1:
-                    return steps
-
-                if grid[row][col] == 1:
-                    currLives -= 1
-
-                for i in range(4):
-                    newRow = row + dir[i]
-                    newCol = col + dir[i+1]
-
-                    if self.isValid(newRow, newCol, n, m) and lives[newRow][newCol] < currLives:
-                        lives[newRow][newCol] = currLives
-                        qu.put([newRow, newCol, currLives])
-
-            steps += 1
-
-        return -1
