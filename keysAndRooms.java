@@ -1,0 +1,61 @@
+import java.util.*;
+ 
+class Solution {
+    public boolean canVisitAllRooms(List<List<Integer>> rooms) {
+
+        //Find the size of the rooms
+        int n = rooms.size();
+
+        // Declare and initialize the visited array
+        boolean[] visited = new boolean[n];
+
+        //Declare a stack
+        Stack<Integer> st = new Stack<>();
+
+        // Push 0 into the stack
+        st.push(0);
+
+        //mark the 0 node as true
+        visited[0] = true;
+
+        //While the stack is not empty 
+        while(!st.empty()){
+
+            //pop the top element from the stack
+            int node = st.pop();
+
+            //Go to the neighbouring nodes 
+            // and mark them as visited
+            for(int it : rooms.get(node)){
+                //if the element it is not visited
+                if(!visited[it]){
+                    //mark it as true
+                    visited[it] = true;
+
+                    //push it into the stack
+                    st.push(it);
+                }
+            }
+        }
+
+        // If all nodes are visited then return false
+        for(boolean v : visited){
+            if(!v){
+                return false;
+            }
+        }
+
+        //otherwise return false
+        return true;
+    }
+}
+
+ 
+        
+      
+        
+        
+
+        
+            
+            
