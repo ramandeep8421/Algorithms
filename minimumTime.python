@@ -1,0 +1,32 @@
+from collections import deque
+import numpy as np
+
+class Solution:
+    def minimumTime(self, n, relations, time):
+        adj = [[] for _ in range(n)]
+        inDegree = [0] * n
+
+        for rel in relations:
+            prev = rel[0] - 1
+            next = rel[1] - 1
+            adj[prev].append(next)
+            inDegree[next] += 1
+
+        q = deque()
+        dist = np.zeros(n, dtype=int)
+
+        for i in range(n):
+            if inDegree[i] == 0:
+                q.append(i)
+                dist[i] = time[i]
+
+        while q:
+            node = q.popleft()
+
+            for neighbor in adj[node]:
+                inDegree[neighbor] -= 1
+                dist[neighbor] = max(dist[neighbor], dist[node] + time[neighbor])
+                if inDegree[neighbor] == 0:
+                    q.append(neighbor)
+
+        return np.max(dist)
