@@ -1,0 +1,46 @@
+from queue import Queue
+
+class Solution:
+    def __init__(self):
+        self.ans = float('inf')
+
+    def bfs(self, node, adj, vis, dis):
+        q = Queue()
+        q.put((node, -1))
+        vis[node] = True
+        dis[node] = 0
+
+        while not q.empty():
+            node, parent = q.get()
+
+            for it in adj[node]:
+                if not vis[it]:
+                    dis[it] = dis[node] + 1
+                    q.put((it, node))
+                    vis[it] = True
+                elif it != parent:
+                    self.ans = min(self.ans, dis[it] + dis[node] + 1)
+
+    def findShortestCycle(self, n, edges):
+        adj = [[] for _ in range(n + 1)]
+
+        for it in edges:
+            adj[it[0]].append(it[1])
+            adj[it[1]].append(it[0])
+
+        for i in range(n):
+            vis = [False] * (n + 1)
+            dis = [1e9] * (n + 1)
+            
+            self.bfs(i, adj, vis, dis)
+
+        if self.ans == float('inf'):
+            return -1
+
+        return self.ans
+
+# Example usage
+solution = Solution()
+n = 4
+edges = [[0, 1], [1, 2], [2, 0], [2, 3], [3, 0]]
+print(solution.findShortestCycle(n, edges))  # Output: 4
